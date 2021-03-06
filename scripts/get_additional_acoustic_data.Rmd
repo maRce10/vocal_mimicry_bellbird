@@ -1,0 +1,20 @@
+---
+title: "Get additional aoustic data"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+
+# download p tricarunculatus
+library(warbleR)
+
+# download p tricarunculatus
+pt <- querxc("Procnias tricarunculatus", download = TRUE, path = "./data/raw/recordings/p_tricarunculatus_XC")
+
+write.csv(pt, "./data/raw/recordings/p_tricarunculatus_XC.csv", row.names = FALSE)
+
+mp32wav(path = "./data/raw/recordings/p_tricarunculatus_XC")
+
+```
