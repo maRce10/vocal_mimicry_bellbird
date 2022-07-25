@@ -1,0 +1,186 @@
+---
+title: "Curate annotations"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+
+## add 'developer/' to packages to be installed from github
+x <- c("remotes", "maRce10/warbleR", "Rraven", "viridis", "ggplot2", "knitr", "kableExtra", "formatR", "ranger", "tuneRanger", "soundgen", "smacof", "caret")
+
+aa <- lapply(x, function(y) {
+  
+  # get pakage name
+  pkg <- strsplit(y, "/")[[1]]
+  pkg <- pkg[length(pkg)]
+  
+  # check if installed, if not then install 
+  if (!pkg %in% installed.packages()[,"Package"])  {
+
+      if (grepl("/", y))  remotes::install_github(y, force = TRUE) else
+    install.packages(y) 
+    }
+
+  # load package
+  try(require(pkg, character.only = T), silent = T)
+})
+
+opts_knit$set(root.dir = "..")
+
+
+```
+
+```{r functions and global parameters}
+
+```
+
+
+```{r check annotations, eval = FALSE}
+
+sf <- list.files("./data/processed/Selections", full.names = TRUE)
+
+dat <- sapply(sf, function(x) read.table(x, sep = "\t"))
+
+ncl <- sapply(dat, ncol)
+
+names(ncl[ncl > 14])
+
+sels1 <- imp_raven(path = "./data/processed/Selections", warbler.format = TRUE, files = basename(names(ncl[ncl < 14])), all.data = TRUE)
+
+sels2 <- imp_raven(path = "./data/processed/Selections", warbler.format = TRUE, files = basename(names(ncl[ncl == 14])), all.data = TRUE)
+
+sels2$Song <- ifelse(is.na(sels2$Song), sels2$Canto, 
+sels2$Song)
+sels2$Song <- ifelse(is.na(sels2$Song), sels2$Soong, 
+sels2$Song)
+
+sels2$Soong <- sels2$Canto <- NULL
+sels1$Song <- NA
+
+names(sels1)
+names(sels2)
+
+sels <- rbind(sels1, sels2)
+
+sels$sound.files <- gsub("Nueva-grabacio?", "Nueva-grabació", sels$sound.files, fixed = TRUE)
+
+# cns_data <- consolidate(path = "./data/raw/recordings", parallel = 10)
+
+cs <- check_sels(X = sels, path = "./data/raw/recordings/consolidated_files")
+
+# cs <- cs[cs$check.res %in% c("sound file not found", "OK"),]
+# 
+# table(cs$check.res)
+# 
+# unique(cs$sound.files[cs$check.res != "OK"])
+
+sels <- sels[cs$check.res == "OK", ]
+
+
+sels$`Model species`[grep("Procnias", sels$`Model species`)] <- "Procnias tricarunculatus"
+
+sels$`Model species`[grep("glossus", sels$`Model species`)] <- "Pteroglossus torquatus"
+
+sels$`Model species`[grep("Ramphastos", sels$`Model species`)] <- "Ramphastos sulfuratus"
+
+
+sels$source <-sels$Recording
+sels$source[grep("cal$", sels$source)] <- "mimetic_bellbird"
+
+sels$source[sels$source == ""] <- "mimetic_bellbird"
+
+sels$source[grep("Procnias", sels$source)] <- "Procnias tricarunculatus"
+
+sels$source[grep("Ramphastos", sels$source)] <- "Ramphastos sulfuratus"
+
+sels$`Model species`[sels$sound.files == "Grab2-4.7.2020.wav"] <- "Procnias tricarunculatus"
+sels$source[sels$sound.files == "Grab2-4.7.2020.wav"] <-  "mimetic_bellbird"
+sels$Vocalization[sels$sound.files == "Grab2-4.7.2020.wav"] <-  "babbling"
+sels$Vocalization[grep("1|2|3", sels$Vocalization)] <-  ""
+
+sels$Vocalization[grep("gres", sels$Vocalization)] <- "aggresive"
+sels$Vocalization[grep("Talama", sels$Vocalization)] <- "Talamancan"
+sels$Vocalization[sels$sound.files == "Procnias-tricarunculatus-476248.wav"] <-  "Monteverde"
+
+sels$Vocalization[grep("Ptero", sels$Vocalization)] <- NA
+sels$Song[sels$Vocalization %in% 1:3] <- sels$Vocalization[sels$Vocalization %in% 1:3]
+
+sels$Vocalization[grep("abblin", sels$Vocalization)] <-  "babbling"
+sels$Vocalization[grep("Pteroglossus", sels$source)] <- NA
+
+sels$Vocalization[sels$Vocalization == "" & !is.na(sels$Vocalization)] <- sels$`Model species`[sels$Vocalization == "" & !is.na(sels$Vocalization)]
+
+sels[sels$Vocalization == "" & !is.na(sels$Vocalization),]
+
+table(sels$source)
+    
+table(sels$Vocalization)
+table(sels$Vocalization, sels$source)
+table(sels$`Model species`, sels$source)
+
+# sels[grepl("mimetic", sels$source) & sels$`Model species` == "", ]
+
+sels$Vocalization[is.na(sels$Vocalization) & sels$source == "mimetic_bellbird" & sels$`Model species` != ""] <- sels$`Model species`[is.na(sels$Vocalization) & sels$source == "mimetic_bellbird" & sels$`Model species` != ""]
+
+View(sels[sels$selec.file %in% sels$selec.file[is.na(sels$Vocalization) & sels$source == "mimetic_bellbird"], ])
+
+
+sels$Vocalization[sels$selec.file %in% sels$selec.file[is.na(sels$Vocalization) & sels$source == "mimetic_bellbird"] & is.na(sels$Vocalization)] <- c("Ramphastos sulfuratus", "Procnias tricarunculatus", "Pteroglossus torquatus")
+
+table(sels$Vocalization[sels$source %in% c("mimetic_bellbird", "Procnias tricarunculatus")])
+
+sels$species.vocalization <- paste(sels$source, sels$Vocalization, sep = "-")
+
+sels$species.vocalization <- gsub("-NA", "-model", sels$species.vocalization)
+
+sels$species.vocalization <- gsub("mimetic_bellbird", "mimetic_P.tricarunculatus", sels$species.vocalization)
+
+sels$species.vocalization <- gsub("Pteroglossus torquatus", "P.torquatus", sels$species.vocalization)
+
+sels$species.vocalization <- gsub("Procnias tricarunculatus", "P.tricarunculatus", sels$species.vocalization)
+
+sels$species.vocalization <- gsub("Ramphastos sulfuratus", "R.sulfuratus", sels$species.vocalization)
+
+sels$species.vocalization <- gsub("mimetic_P.tricarunculatus-P.tricarunculatus", "mimetic_P.tricarunculatus-adult", sels$species.vocalization)
+
+sels$species.vocalization <- gsub("Whistle", "whistle", sels$species.vocalization)
+
+sels$species.vocalization <- gsub("Nicaraguan", "Nicaragua", sels$species.vocalization)
+
+sels$species.vocalization <- gsub("Talamancan", "Talamanca", sels$species.vocalization)
+
+
+write.csv(sels, "./data/processed/pooled_annotations.csv", row.names = FALSE)
+
+# write.csv(data.frame(missing = unique(cs$sound.files[cs$check.res != "OK"])), "./data/processed/missing_sound_files.csv", row.names = FALSE)
+
+```
+
+
+'species.vocalization' column contains all the info about which species (and mimetic individual) was singing and which sound or model species was producing
+```{r read annotations}
+ 
+warbleR_options(wav.path = "./data/raw/recordings/consolidated_files")
+
+sels <- read.csv("./data/processed/pooled_annotations.csv")
+
+cs <- check_sels(sels)
+table(cs$check.res)
+
+spectrograms(sels, fast.spec = TRUE, flim = c(0, 10), wl = 512, ovlp = 50, parallel = 10, dest.path = "./data/processed/spectrograms")
+
+```
+
+## Create catalogs
+```{r Create catalogs, eval = FALSE}
+
+# create catalogs
+catalog(X = sls, flim = c(1, 3.5), nrow = 12, ncol = 15, ovlp = 70, height = 15, width = 23, same.time.scale = TRUE, mar = 0.005, wl = 512, gr = FALSE, spec.mar = 0.4, lab.mar = 0.8, rm.axes = TRUE, by.row = TRUE, box = TRUE, labels = c("sf.abbr", "selec"), fast.spec = TRUE, pal = viridis, parallel = 10)
+
+# move images to figures folder
+move_imgs(from = .Options$warbleR$path, to = "./figures", overwrite = TRUE)
+
+```
+
