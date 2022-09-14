@@ -24,7 +24,7 @@ editor_options:
 # remotes::install_github("rlesur/klippy")
 
 # github packages must include user name ("user/package")
-pkgs <- c("rlesur/klippy", "kableExtra", "knitr", "remotes", "maRce10/warbleR", "Rraven", "viridis", "ggplot2", "formatR", "soundgen", "caret")
+pkgs <- c("rlesur/klippy", "kableExtra", "knitr", "remotes", "maRce10/warbleR", "Rraven", "viridis", "ggplot2", "formatR", "soundgen", "caret", "randomForest")
 
 # install/ load packages
 out <- lapply(pkgs, function(y) {
@@ -46,11 +46,6 @@ out <- lapply(pkgs, function(y) {
   if (!a) remove.packages(pkg)
   })
 
-
-```
-
-```{r setup, include = FALSE, eval = TRUE}
-
 opts_knit$set(root.dir = "..")
 
 knitr::opts_chunk$set(
@@ -61,10 +56,6 @@ knitr::opts_chunk$set(
   eval = FALSE
  )
 
-```
-
-```{r custom data frame printing, echo = FALSE, eval = TRUE}
-
 # this is a customized printing for data frames 
 # screws up tibble function
 tibble <- function(x, ...) { 
@@ -74,10 +65,6 @@ tibble <- function(x, ...) {
 }
 
 registerS3method("knit_print", "data.frame", tibble)
-
-```
-
-```{r klippy, echo=FALSE, include=TRUE}
 
 # to add copy button to code blocks
 klippy::klippy(position = c('top', 'right'))
@@ -146,7 +133,8 @@ aggregate(org.sound.files ~ species.vocalization, model_sounds, length)
 
 # Measure acoustic parameters
 
-- Measure only on signals with a signal-to-noise ratio above 2 DDB
+- Measure only on signals with a signal-to-noise ratio above 2 dB
+- Measure spectral parameters and MFCCs
 - Vocalization column has the info about the sound that were made by the mimetic bellbird and the dialect
 
 ```{r}
@@ -171,7 +159,7 @@ saveRDS(high_snr_est, "./data/processed/extended_selection_table_high_snr_models
 
 ```
 
-```{r measure acoustic parameters}
+```{r measure acoustic parameters and MFCC}
 
 high_snr_est <- readRDS("./data/processed/extended_selection_table_high_snr_models_and_allmimetic_sounds.RDS")
 
@@ -181,6 +169,11 @@ sp_param$species.vocalization <- high_snr_est$species.vocalization
 
 write.csv(sp_param, "./data/processed/acoustic_parameters_model_and_mimetic.csv", row.names = FALSE)
 
+mel_param <- mfcc_stats(high_snr_est, parallel = 4)
+
+mel_param$species.vocalization <- high_snr_est$species.vocalization
+
+write.csv(mel_param, "./data/processed/mfcc_stats_model_and_mimetic.csv", row.names = FALSE)
 ```
 
 
@@ -189,7 +182,9 @@ write.csv(sp_param, "./data/processed/acoustic_parameters_model_and_mimetic.csv"
 ## Model to classify bellbird dialects
 
 ### Train model
-```{r train random forest on data subsets using K-folds dialects}
+
+#### Spectral parameters
+```{r train random forest on data subsets using K-folds dialects spectral parameters}
 
 model_sp_param <- sp_param[grep("mimetic", sp_param$species.vocalization, invert = TRUE), ]
 
@@ -221,14 +216,56 @@ conf_df$total <- sapply(conf_df$Reference, function(x) sum(testset$species.vocal
 
 conf_df$proportion <- conf_df$Freq / conf_df$total
 
-saveRDS(list(pred_model_bb = pred_model, conf_mat_bb = conf_mat, confusion_df_bb = conf_df, testset_bb = testset), "./data/processed/random_forest_model_results_olny_bellbird_dialects.RDS")
+saveRDS(list(pred_model_bb = pred_model, conf_mat_bb = conf_mat, confusion_df_bb = conf_df, testset_bb = testset), "./data/processed/random_forest_model_results_only_bellbird_dialects.RDS")
+
+```
+
+### MFCCs
+```{r train random forest on data subsets using K-folds dialects MFCCs}
+
+mel_param <- read.csv("./data/processed/mfcc_stats_model_and_mimetic.csv")
+
+model_mel_param <- mel_param[grep("mimetic", mel_param$species.vocalization, invert = TRUE), ]
+
+# only bellbird dialects
+model_mel_param <- model_mel_param[grep("P.tricarunculatus-", model_mel_param$species.vocalization), ]
+
+# remove babbling due to low sample size (16)
+model_mel_param <- model_mel_param[model_mel_param$species.vocalization != "P.tricarunculatus-babbling", ]
+
+model_mel_param$species.vocalization <- as.factor(make.names(model_mel_param$species.vocalization, unique = FALSE, allow_ = TRUE))
+
+# Create data subsets
+set.seed(123)
+partition <- createDataPartition(y = model_mel_param$species.vocalization, times = 1, p = 0.75, list = FALSE)
+
+trainset <- model_mel_param[partition, -c(1, 2)]
+testset <- model_mel_param[-partition, -c(1, 2)]
+
+trcontrol <- trainControl(method = 'repeatedcv', number = 30, savePredictions = TRUE,
+classProbs = TRUE, returnResamp = "all", repeats = 30)
+
+pred_model <- train(species.vocalization ~ . , data=trainset, method = "rf", trControl = trcontrol, metric="Accuracy", preProcess = "BoxCox")
+
+# save confusion matrix
+conf_mat <- confusionMatrix(predict(pred_model, testset), testset$species.vocalization)
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(testset$species.vocalization == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+saveRDS(list(pred_model_bb = pred_model, conf_mat_bb = conf_mat, confusion_df_bb = conf_df, testset_bb = testset), "./data/processed/random_forest_model_results_only_bellbird_dialects_MFCCs.RDS")
 
 ```
 
 ### Diagnose performance on test data
+
+#### Spectral parameters
 ```{r, eval = TRUE}
 
-rf_model_results_bb <- readRDS("./data/processed/random_forest_model_results_olny_bellbird_dialects.RDS")
+rf_model_results_bb <- readRDS("./data/processed/random_forest_model_results_only_bellbird_dialects.RDS")
 
 confusion_df <- rf_model_results_bb$confusion_df_bb
 confusion_df$Prediction <- gsub(".model|P.tricarunculatus.", "", confusion_df$Prediction)
@@ -246,8 +283,30 @@ rf_model_results_bb$conf_mat_bb
 
 ```
 
+#### MFCCs
+```{r, eval = TRUE}
+
+rf_model_results_bb_mfcc <- readRDS("./data/processed/random_forest_model_results_only_bellbird_dialects_MFCCs.RDS")
+
+confusion_df <- rf_model_results_bb_mfcc$confusion_df_bb
+confusion_df$Prediction <- gsub(".model|P.tricarunculatus.", "", confusion_df$Prediction)
+confusion_df$Reference <- gsub(".model|P.tricarunculatus.", "", confusion_df$Reference)
+
+ggplot(confusion_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+# print confusion matrix results
+rf_model_results_bb_mfcc$conf_mat_bb
+
+```
+
 ### Predict mimetic bellbird dialect
-```{r predict mimetic dialects, eval = TRUE}
+#### Spectral parameters
+```{r predict mimetic dialects spectral parameters, eval = TRUE}
 
 mimetic_no_calls <- sp_param[grep("mimetic_P.tricarunculatus-adult", sp_param$species.vocalization), ]
 
@@ -259,11 +318,27 @@ table(mimetic_no_calls$pred.class)
 
 ```
 
+#### MFCCs
+```{r predict mimetic dialects MFCCs, eval = TRUE}
+
+mel_param <- read.csv("./data/processed/mfcc_stats_model_and_mimetic.csv")
+
+mimetic_no_calls_mel <- mel_param[grep("mimetic_P.tricarunculatus-adult", mel_param$species.vocalization), ]
+
+mimetic_no_calls_mel$species.vocalization <- as.factor(make.names(mimetic_no_calls_mel$species.vocalization, unique = FALSE, allow_ = TRUE))
+
+mimetic_no_calls_mel$pred.class <- as.character(predict(rf_model_results_bb_mfcc$pred_model_bb, mimetic_no_calls_mel))
+
+table(mimetic_no_calls_mel$pred.class)
+
+```
+
 ---
 
 ## Model on data including all bellbird dialects as separate categories
 
 ### Train model
+#### Spectral parameters
 ```{r train random forest on data subsets using K-folds}
 
 model_sp_param <- sp_param[grep("mimetic", sp_param$species.vocalization, invert = TRUE), ]
@@ -279,7 +354,7 @@ partition <- createDataPartition(y = model_sp_param$species.vocalization, times 
 trainset <- model_sp_param[partition, -c(1, 2)]
 testset <- model_sp_param[-partition, -c(1, 2)]
 
-trcontrol <- trainControl(method = 'repeatedcv', number = 100, savePredictions = TRUE,
+trcontrol <- trainControl(method = 'repeatedcv', number = 30, savePredictions = TRUE,
 classProbs = TRUE, returnResamp = "all", repeats = 100)
 
 pred_model <- train(species.vocalization ~ . , data=trainset, method = "rf", trControl = trcontrol, metric="Accuracy", preProcess = "BoxCox")
@@ -297,8 +372,44 @@ saveRDS(list(pred_model = pred_model, conf_mat = conf_mat, confusion_df = conf_d
 
 ```
 
+#### MFCCs
+```{r train random forest on data subsets using K-folds MFCCs}
+
+model_mel_param <- mel_param[grep("mimetic", mel_param$species.vocalization, invert = TRUE), ]
+
+# remove babbling due to low sample size (16)
+model_mel_param <- model_mel_param[model_mel_param$species.vocalization != "P.tricarunculatus-babbling", ]
+
+model_mel_param$species.vocalization <- as.factor(make.names(model_mel_param$species.vocalization, unique = FALSE, allow_ = TRUE))
+
+# Create data subsets
+set.seed(123)
+partition <- createDataPartition(y = model_mel_param$species.vocalization, times = 1, p = 0.75, list = FALSE)
+
+trainset <- model_mel_param[partition, -c(1, 2)]
+testset <- model_mel_param[-partition, -c(1, 2)]
+
+trcontrol <- trainControl(method = 'repeatedcv', number = 30, savePredictions = TRUE,
+classProbs = TRUE, returnResamp = "all", repeats = 30)
+
+pred_model <- train(species.vocalization ~ . , data=trainset, method = "rf", trControl = trcontrol, metric="Accuracy", preProcess = "BoxCox")
+
+# save confusion matrix
+conf_mat <- confusionMatrix(predict(pred_model, testset), testset$species.vocalization)
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(testset$species.vocalization == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+saveRDS(list(pred_model = pred_model, conf_mat = conf_mat, confusion_df = conf_df, testset = testset), "./data/processed/random_forest_model_results_with_dialects_MFCCs.RDS")
+
+```
+
 ### Diagnose performance on test data
-```{r, eval = TRUE}
+#### Spectral parameters
+```{r spectral parameters, eval = TRUE}
 
 rf_model_results <- readRDS("./data/processed/random_forest_model_results_with_dialects.RDS")
 
@@ -319,8 +430,32 @@ rf_model_results$conf_mat
 
 ```
 
+#### MFCCs
+```{r MFCC, eval = TRUE}
+
+rf_model_results_mfcc <- readRDS("./data/processed/random_forest_model_results_with_dialects_MFCCs.RDS")
+
+confusion_df <- rf_model_results_mfcc$confusion_df
+confusion_df$Prediction <- gsub(".model", "", confusion_df$Prediction)
+confusion_df$Reference <- gsub(".model", "", confusion_df$Reference)
+
+ggplot(confusion_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    labs(x = "Manually labeled category", y = "Predicted category") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+# print confusion matrix results
+rf_model_results_mfcc$conf_mat
+
+```
+
+
 ### Predict mimetic bellbird and compare to manual labels
-```{r predict mimetic sounds keeping dialects, eval = TRUE}
+#### Spectral parameters
+```{r predict mimetic sounds keeping dialects spectral parameters, eval = TRUE}
 
 mimetic_sp_param <- sp_param[grep("mimetic", sp_param$species.vocalization), ]
 
@@ -332,6 +467,50 @@ mimetic_no_calls$pred.class <- as.character(predict(rf_model_results$pred_model,
 
 mimetic_no_calls$species.vocalization <- as.character(mimetic_no_calls$species.vocalization)
 
+mimetic_no_calls$pred.class[grep("montezuma", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("montezuma", mimetic_no_calls$species.vocalization)] <- "P.montezuma"
+
+mimetic_no_calls$pred.class[grep("torquatus", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("torquatus", mimetic_no_calls$species.vocalization)] <- "P.torquatus"
+
+mimetic_no_calls$pred.class[grep("sulfuratus", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("sulfuratus", mimetic_no_calls$species.vocalization)] <- "R.sulfuratus"
+
+mimetic_no_calls$species.vocalization[grep("tricarunculatus", mimetic_no_calls$species.vocalization)] <- "P.tricarunculatus.Talamanca"
+
+
+conf_mat <- confusionMatrix(data = factor(mimetic_no_calls$pred.class), reference = factor(mimetic_no_calls$species.vocalization, levels = unique(mimetic_no_calls$pred.class)))
+
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(mimetic_no_calls$species.vocalization == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+conf_df <- conf_df[conf_df$Reference %in% unique(mimetic_no_calls$species.vocalization), ]
+
+conf_df$Prediction  <- factor(conf_df$Prediction, levels = c("R.sulfuratus", "P.torquatus", "P.montezuma", "P.tricarunculatus.Talamanca", "P.tricarunculatus.Nicaragua", "P.tricarunculatus.Panama", "P.tricarunculatus.Monteverde"))
+
+ggplot(conf_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    labs(x = "Manually labeled category", y = "Predicted category") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+conf_mat
+```
+
+```{r predict mimetic sounds keeping dialects MFCC, eval = TRUE}
+
+mimetic_mel_param <- mel_param[grep("mimetic", mel_param$species.vocalization), ]
+
+mimetic_no_calls <- mimetic_mel_param[!mimetic_mel_param$species.vocalization %in% c("mimetic_P.tricarunculatus-babbling", "mimetic_P.tricarunculatus-aggresive", "mimetic_P.tricarunculatus-whistle"), ]
+
+mimetic_no_calls$species.vocalization <- as.factor(make.names(mimetic_no_calls$species.vocalization, unique = FALSE, allow_ = TRUE))
+
+mimetic_no_calls$pred.class <- as.character(predict(rf_model_results_mfcc$pred_model, mimetic_no_calls))
+
+mimetic_no_calls$species.vocalization <- as.character(mimetic_no_calls$species.vocalization)
 
 mimetic_no_calls$pred.class[grep("montezuma", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("montezuma", mimetic_no_calls$species.vocalization)] <- "P.montezuma"
 
@@ -367,7 +546,8 @@ conf_mat
 ```
 
 ### Predict mimetic bellbirds but collapse predicted bellbird dialects as a single category
-```{r predict mimetic sounds no dialects, eval = TRUE}
+#### Spectral parameters
+```{r predict mimetic sounds no dialects spectral parameters, eval = TRUE}
 
 mimetic_sp_param <- sp_param[grep("mimetic", sp_param$species.vocalization), ]
 
@@ -410,12 +590,57 @@ ggplot(conf_df, aes(x = Reference, y = Prediction, fill = proportion)) +
 conf_mat
 ```
 
+#### MFCCs
+```{r predict mimetic sounds no dialects MFCCs, eval = TRUE}
+
+mimetic_mel_param <- mel_param[grep("mimetic", mel_param$species.vocalization), ]
+
+mimetic_no_calls <- mimetic_mel_param[!mimetic_mel_param$species.vocalization %in% c("mimetic_P.tricarunculatus-babbling", "mimetic_P.tricarunculatus-aggresive", "mimetic_P.tricarunculatus-whistle"), ]
+
+mimetic_no_calls$species.vocalization <- as.factor(make.names(mimetic_no_calls$species.vocalization, unique = FALSE, allow_ = TRUE))
+
+mimetic_no_calls$pred.class <- as.character(predict(rf_model_results_mfcc$pred_model, mimetic_no_calls))
+
+mimetic_no_calls$species.vocalization <- as.character(mimetic_no_calls$species.vocalization)
+
+mimetic_no_calls$pred.class[grep("tricarun", mimetic_no_calls$pred.class)] <- "P.tricarunculatus"
+
+mimetic_no_calls$pred.class[grep("montezuma", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("montezuma", mimetic_no_calls$species.vocalization)] <- "P.montezuma"
+
+mimetic_no_calls$pred.class[grep("torquatus", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("torquatus", mimetic_no_calls$species.vocalization)] <- "P.torquatus"
+
+mimetic_no_calls$pred.class[grep("sulfuratus", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("sulfuratus", mimetic_no_calls$species.vocalization)] <- "R.sulfuratus"
+
+mimetic_no_calls$pred.class[grep("tricarunculatus", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("tricarunculatus", mimetic_no_calls$species.vocalization)] <- "P.tricarunculatus"
+
+
+conf_mat <- confusionMatrix(data = factor(mimetic_no_calls$pred.class), reference = factor(mimetic_no_calls$species.vocalization))
+
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(mimetic_no_calls$species.vocalization == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+ggplot(conf_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    labs(x = "Manually labeled category", y = "Predicted category") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+conf_mat
+```
+
 ---
 
 ## Model on data collapsing all dialects into a single category
 
 ### Train model
-```{r train random forest on data subsets using K-folds collapsing dialects}
+#### Spectral parameters
+```{r train random forest on data subsets using K-folds collapsing dialects spectral parameters}
 
 model_sp_param <- sp_param[grep("mimetic", sp_param$species.vocalization, invert = TRUE), ]
 
@@ -452,8 +677,47 @@ saveRDS(list(pred_model_nd = pred_model, conf_mat_nd = conf_mat, confusion_df_nd
 
 ```
 
+#### MFCCs
+```{r train random forest on data subsets using K-folds collapsing dialects MFCCs}
+
+model_mel_param <- mel_param[grep("mimetic", mel_param$species.vocalization, invert = TRUE), ]
+
+# remove babbling due to low sample size (16)
+model_mel_param <- model_mel_param[model_mel_param$species.vocalization != "P.tricarunculatus-babbling", ]
+
+# collapse bellbird dialects
+model_mel_param$species.vocalization[grep("P.tricarunculatus", model_mel_param$species.vocalization)] <- "P.tricarunculatus"
+
+model_mel_param$species.vocalization <- as.factor(make.names(model_mel_param$species.vocalization, unique = FALSE, allow_ = TRUE))
+
+# Create data subsets
+partition <- createDataPartition(y = model_mel_param$species.vocalization, times = 1, p = 0.75, list = FALSE)
+
+trainset <- model_mel_param[partition, -c(1, 2)]
+testset <- model_mel_param[-partition, -c(1, 2)]
+
+trcontrol <- trainControl(method = 'repeatedcv', number = 30, savePredictions = TRUE,
+classProbs = TRUE, returnResamp = "all", repeats = 30)
+
+pred_model <- train(species.vocalization ~ . , data=trainset, method = "rf", trControl = trcontrol, metric="Accuracy", preProcess = "BoxCox")
+
+# save confusion matrix
+conf_mat <- confusionMatrix(predict(pred_model, testset), testset$species.vocalization)
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(testset$species.vocalization == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+#nd = no dialects
+saveRDS(list(pred_model_nd = pred_model, conf_mat_nd = conf_mat, confusion_df_nd = conf_df, testset_nd = testset), "./data/processed/random_forest_model_results_collapsing_dialects_MFCCs.RDS")
+
+```
+
 ### Predicting test data
-```{r, eval = TRUE}
+#### Spectral parameters
+```{r spectral parameters test, eval = TRUE}
 
 rf_model_results_nd <- readRDS("./data/processed/random_forest_model_results_collapsing_dialects.RDS")
 
@@ -474,8 +738,31 @@ rf_model_results_nd$conf_mat_nd
 
 ```
 
+#### MFCCs
+```{r MFCCs, eval = TRUE}
+
+rf_model_results_nd_mfccs <- readRDS("./data/processed/random_forest_model_results_collapsing_dialects_MFCCs.RDS")
+
+confusion_df <- rf_model_results_nd_mfccs$confusion_df_nd
+confusion_df$Prediction <- gsub(".model", "", confusion_df$Prediction)
+confusion_df$Reference <- gsub(".model", "", confusion_df$Reference)
+
+ggplot(confusion_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    labs(x = "Manually labeled category", y = "Predicted category") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+# print confusion matrix results
+rf_model_results_nd_mfccs$conf_mat_nd
+
+```
+
 ### Predict mimetic bellbird and compare to manual labels
-```{r predict mimetic sounds no dialects 2, eval = TRUE}
+#### Spectral parameters
+```{r predict mimetic sounds no dialects spectral parameters 2, eval = TRUE}
 
 mimetic_sp_param <- sp_param[grep("mimetic", sp_param$species.vocalization), ]
 
@@ -484,6 +771,50 @@ mimetic_no_calls <- mimetic_sp_param[!mimetic_sp_param$species.vocalization %in%
 mimetic_no_calls$species.vocalization <- as.factor(make.names(mimetic_no_calls$species.vocalization, unique = FALSE, allow_ = TRUE))
 
 mimetic_no_calls$pred.class <- as.character(predict(rf_model_results_nd$pred_model_nd, mimetic_no_calls))
+
+mimetic_no_calls$species.vocalization <- as.character(mimetic_no_calls$species.vocalization)
+
+mimetic_no_calls$pred.class[grep("tricarun", mimetic_no_calls$pred.class)] <- "P.tricarunculatus"
+
+mimetic_no_calls$pred.class[grep("montezuma", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("montezuma", mimetic_no_calls$species.vocalization)] <- "P.montezuma"
+
+mimetic_no_calls$pred.class[grep("torquatus", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("torquatus", mimetic_no_calls$species.vocalization)] <- "P.torquatus"
+
+mimetic_no_calls$pred.class[grep("sulfuratus", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("sulfuratus", mimetic_no_calls$species.vocalization)] <- "R.sulfuratus"
+
+mimetic_no_calls$pred.class[grep("tricarunculatus", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("tricarunculatus", mimetic_no_calls$species.vocalization)] <- "P.tricarunculatus"
+
+
+conf_mat <- confusionMatrix(data = factor(mimetic_no_calls$pred.class), reference = factor(mimetic_no_calls$species.vocalization))
+
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(mimetic_no_calls$species.vocalization == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+ggplot(conf_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    labs(x = "Manually labeled category", y = "Predicted category") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+conf_mat
+```
+
+#### MFCCs
+```{r predict mimetic sounds no dialects MFCCs 2, eval = TRUE}
+
+mimetic_mel_param <- mel_param[grep("mimetic", mel_param$species.vocalization), ]
+
+mimetic_no_calls <- mimetic_mel_param[!mimetic_mel_param$species.vocalization %in% c("mimetic_P.tricarunculatus-babbling", "mimetic_P.tricarunculatus-aggresive", "mimetic_P.tricarunculatus-whistle"), ]
+
+mimetic_no_calls$species.vocalization <- as.factor(make.names(mimetic_no_calls$species.vocalization, unique = FALSE, allow_ = TRUE))
+
+mimetic_no_calls$pred.class <- as.character(predict(rf_model_results_nd_mfccs$pred_model_nd, mimetic_no_calls))
 
 mimetic_no_calls$species.vocalization <- as.character(mimetic_no_calls$species.vocalization)
 
@@ -613,6 +944,130 @@ conf_df <- as.data.frame(conf_mat$table)
 conf_df$total <- sapply(conf_df$Reference, function(x) sum(mimetic_no_calls$species.vocalization == x))
 
 conf_df$proportion <- conf_df$Freq / conf_df$total
+
+ggplot(conf_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    labs(x = "Manually labeled category", y = "Predicted category") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+conf_mat
+```
+
+
+### VGGish results
+
+#### Predicting bellbird dialects
+Test data
+```{r vgg results, eval = TRUE}
+
+vgg <- read.csv("./data/processed/turicreate_results_test_many_dialects.csv")
+
+# vgg$category <- factor(vgg$category, levels = c(unique(vgg$category), "P.tricarunculatus-Monteverde", "P.tricarunculatus-Nicaragua", "P.tricarunculatus-Panama"))
+
+vgg$category <- factor(vgg$category)
+vgg$pred <- factor(vgg$pred)
+
+conf_mat <- confusionMatrix(data = vgg$pred, reference = vgg$category)
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(vgg$category == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+conf_df <- conf_df[complete.cases(conf_df), ]
+
+ggplot(conf_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    labs(x = "Manually labeled category", y = "Predicted category") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+conf_mat
+```
+
+Mimetic bellbird
+```{r vgg results mimetic bellbird, eval = TRUE}
+
+vgg <- read.csv("./data/processed/turicreate_results_mimetic_many_dialects.csv")
+
+vgg$category <- factor(vgg$category, levels = c(unique(vgg$category), "P.tricarunculatus-Monteverde", "P.tricarunculatus-Nicaragua", "P.tricarunculatus-Panama"))
+vgg$pred <- factor(vgg$pred)
+
+conf_mat <- confusionMatrix(data = vgg$pred, reference = vgg$category)
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(vgg$category == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+conf_df <- conf_df[complete.cases(conf_df), ]
+
+ggplot(conf_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    labs(x = "Manually labeled category", y = "Predicted category") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+conf_mat
+```
+
+#### No bellbird dialects
+Test data
+```{r vgg results no dialects, eval = TRUE}
+
+vgg <- read.csv("./data/processed/turicreate_results_test_no_dialects.csv")
+
+vgg$category <- factor(vgg$categorynd)
+vgg$pred <- factor(vgg$pred)
+
+conf_mat <- confusionMatrix(data = vgg$pred, reference = vgg$category)
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(vgg$category == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+conf_df <- conf_df[complete.cases(conf_df), ]
+
+ggplot(conf_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    labs(x = "Manually labeled category", y = "Predicted category") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+conf_mat
+```
+
+Mimetic bellbird
+```{r vgg results mimetic bellbird no dialects, eval = TRUE}
+
+vgg <- read.csv("./data/processed/turicreate_results_mimetic_no_dialects.csv")
+
+# vgg$category <- factor(vgg$category, levels = c(unique(vgg$category), "P.tricarunculatus-Monteverde", "P.tricarunculatus-Nicaragua", "P.tricarunculatus-Panama"))
+vgg$category <- factor(vgg$categorynd)
+vgg$pred <- factor(vgg$prednd)
+
+conf_mat <- confusionMatrix(data = vgg$pred, reference = vgg$category)
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(vgg$category == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+conf_df <- conf_df[complete.cases(conf_df), ]
 
 ggplot(conf_df, aes(x = Reference, y = Prediction, fill = proportion)) +
   geom_tile() + theme_bw() + coord_equal() +
