@@ -1,0 +1,497 @@
+---
+title: <center><font size="7"><b>VGGish automatic classification</b></font></center>
+subtitle: <center><font size="4"><b>Bellbird vocal mimicry</b> <br> Universidad de Costa Rica</font></center>
+author: <center><font size="3"><a href="https://marceloarayasalas.weebly.com/">Marcelo Araya-Salas</a> & Pablo Huertas</font></center>
+date: <center>"`r Sys.Date()`"</center>
+output:
+  html_document:
+    code_folding: hide
+    # css: extra.css
+    df_print: tibble
+    highlight: pygments  
+    toc: yes
+    toc_depth: 4
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+fontsize: 12pt 
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r load packages, echo = FALSE, message = FALSE, warning=FALSE}
+
+# remotes::install_github("rlesur/klippy")
+
+# github packages must include user name ("user/package")
+pkgs <- c("rlesur/klippy", "kableExtra", "knitr", "remotes", "Rraven", "viridis", "ggplot2", "formatR", "caret", "pbapply")
+
+# install/ load packages
+out <- lapply(pkgs, function(y) {
+  
+  # get pakage name
+  pkg <- strsplit(y, "/")[[1]]
+  pkg <- pkg[length(pkg)]
+  
+  # check if installed, if not then install 
+  if (!pkg %in% installed.packages()[,"Package"])  {
+
+      if (grepl("/", y))  remotes::install_github(y, force = TRUE) else
+    install.packages(y) 
+    }
+
+  # load package
+  a <- try(require(pkg, character.only = T), silent = T)
+
+  if (!a) remove.packages(pkg)
+  })
+
+opts_knit$set(root.dir = "..")
+
+knitr::opts_chunk$set(
+  tidy.opts = list(width.cutoff = 65), 
+  tidy = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  eval = FALSE
+ )
+
+# this is a customized printing for data frames 
+# screws up tibble function
+tibble <- function(x, ...) { 
+  x <- kbl(x, digits=4, align= 'c', row.names = FALSE) 
+   x <- kable_styling(x, position ="center", full_width = FALSE,  bootstrap_options = c("striped", "hover", "condensed", "responsive")) 
+   asis_output(x)
+}
+
+registerS3method("knit_print", "data.frame", tibble)
+
+# to add copy button to code blocks
+klippy::klippy(position = c('top', 'right'))
+
+```
+
+```{r organize data for turicreate, eval = FALSE, echo = FALSE}
+
+bb_est <- readRDS("~/Dropbox/Projects/vggish_test/bellbird_data/extended_selection_table_high_snr_models_and_allmimetic_sounds.RDS")
+
+head(bb_est)
+
+durs <- sapply(attr(bb_est, "wave.objects"), length)
+
+mx_dur <- max(durs)
+
+# export clips
+# out <- pblapply(1:nrow(bb_est), cl = 4, function(i){
+#   
+#   x <- attr(bb_est, "wave.objects")[[i]]
+#   dur <- length(x)
+#   
+#   if (dur < mx_dur)
+#     x@left <- c(rep(0, floor((mx_dur- dur) / 2)), x@left, rep(0, floor((mx_dur- dur) / 2)))
+#     
+#   if (length(x) < mx_dur)
+#     x@left <- c(x@left, rep(0, mx_dur - length(x)))
+#   
+#   writeWave(x, filename = file.path("/home/m/Dropbox/Projects/vggish_test/bellbird_data/audio", paste0(bb_est$sound.files[i], ".wav")))
+# 
+#   return(NULL)
+#   })
+
+
+sfi <- info_sound_files("/home/m/Dropbox/estudiantes/Pablo_Huertas/vocal_mimicry_bellbird/data/raw/bellbird_data/audio")
+
+
+
+bb_est$org.sound.files <- sapply(strsplit(bb_est$sound.files,
+                                            ".wav", fixed = TRUE), "[", 1)
+
+
+model_sounds <- as.data.frame(bb_est[grep("babbling", bb_est$species.vocalization,
+                                  invert = TRUE), ])
+
+model_sounds$filename <- paste0(model_sounds$sound.files, ".wav")
+
+# model_sounds$species.vocalization[grep("mimetic", model_sounds$species.vocalization)] <- "Mimetic"
+
+model_sounds$species.vocalization <- gsub("-model", "", model_sounds$species.vocalization)
+
+model_sounds <- model_sounds[grep("babbling", model_sounds$species.vocalization,
+                                  invert = TRUE), ]
+
+mimetic_sounds <- model_sounds[grep("mimetic", model_sounds$species.vocalization), ]
+
+mimetic_sounds$species.vocalization[grep("adult|aggresive|whistle", mimetic_sounds$species.vocalization)] <- "P.tricarunculatus-Talamanca"
+
+mimetic_sounds$species.vocalization <- gsub(pattern = "mimetic_P.tricarunculatus-", "", mimetic_sounds$species.vocalization)
+
+model_sounds <- model_sounds[grep("mimetic", model_sounds$species.vocalization, invert = TRUE), ]
+
+model_sounds$categorynd <- model_sounds$species.vocalization
+mimetic_sounds$categorynd <- mimetic_sounds$species.vocalization
+
+model_sounds$categorynd[grep("P.tricarunculatus", model_sounds$categorynd)] <- "P.tricarunculatus"
+mimetic_sounds$categorynd[grep("P.tricarunculatus", mimetic_sounds$categorynd)] <- "P.tricarunculatus"
+aggregate(org.sound.files ~ species.vocalization, model_sounds, function(x) length(unique(x)))
+
+set.seed(123)
+part <- caret::createDataPartition(y = model_sounds$species.vocalization[model_sounds$species.vocalization != "Mimetic"], times = 1, p  = 0.75)
+
+length(part$Resample1) / nrow(model_sounds)
+
+model_sounds$fold <- "test"
+model_sounds$fold[part$Resample1] <- "train"
+mimetic_sounds$fold <- "mimetic"
+
+# collapsing dialects
+set.seed(123)
+partnd <- caret::createDataPartition(y = model_sounds$categorynd, times = 1, p  = 0.75)
+
+length(partnd$Resample1) / nrow(model_sounds)
+
+model_sounds$foldnd <- "test"
+model_sounds$foldnd[part$Resample1] <- "train"
+mimetic_sounds$foldnd <- "mimetic"
+
+full_dat <- rbind(model_sounds, mimetic_sounds)
+
+full_dat$category <- full_dat$species.vocalization
+
+head(full_dat)
+write.csv(full_dat[, c("filename", "fold", "category", "foldnd", "categorynd")], "/home/m/Dropbox/Projects/vggish_test/bellbird_data/bellbird.csv")
+
+nrow(full_dat)
+
+table(full_dat$category[full_dat$fold == "mimetic"])
+table(full_dat$categorynd[full_dat$foldnd == "mimetic"])
+table(full_dat$category[full_dat$fold != "mimetic"])
+table(full_dat$categorynd[full_dat$foldnd != "mimetic"])
+
+```
+
+&nbsp; 
+
+<!-- skyblue box -->
+
+<div class="alert alert-info">
+
+# Purpose
+
+- Assess similarity of "mimetic" bellbird vocalizations to those of putative model species using the VGGish deep learning algorithm
+
+</div>
+
+&nbsp;
+
+# Check sample sizes
+
+Number of sound files per model species and the "mimetic" bellbird:
+```{r sample sizes, eval = TRUE}
+
+sp_param <- read.csv("./data/processed/acoustic_parameters_model_and_mimetic.csv")
+
+sp_param$org.sound.files <- sapply(strsplit(sp_param$sound.files, ".wav", fixed = TRUE), "[", 1)
+
+model_sounds <- sp_param #[grep("mimetic", sp_param$species.vocalization, invert = TRUE), ]
+model_sounds <- model_sounds[grep("babbling", model_sounds$species.vocalization, invert = TRUE), ]
+model_sounds$species.vocalization[grep("mimetic", model_sounds$species.vocalization)] <- "Mimetic"
+
+model_sounds$species.vocalization <- gsub("-model", "", model_sounds$species.vocalization)
+
+aggregate(org.sound.files ~ species.vocalization, model_sounds, function(x) length(unique(x)))
+
+```
+
+Number of annotated vocalizations (after removing SNR < 2 dB):
+
+```{r, eval = TRUE}
+
+aggregate(org.sound.files ~ species.vocalization, model_sounds, length)
+
+
+```
+
+---
+
+# VGGish results
+
+## Model trained including bellbird dialects
+### Test data
+```{r vgg results, eval = TRUE}
+
+vgg <- read.csv("./data/processed/turicreate_results_test_many_dialects.csv")
+
+
+vgg$category <- factor(vgg$category)
+vgg$pred <- factor(vgg$pred)
+
+conf_mat <- confusionMatrix(data = vgg$pred, reference = vgg$category)
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(vgg$category == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+conf_df <- conf_df[complete.cases(conf_df), ]
+
+ggplot(conf_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    labs(x = "Manually labeled category", y = "Predicted category") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+round(conf_mat$overall, 3)
+
+```
+
+### Mimetic bellbird
+```{r vgg results mimetic bellbird, eval = TRUE}
+
+vgg <- read.csv("./data/processed/turicreate_results_mimetic_many_dialects.csv")
+
+vgg$category <- factor(vgg$category, levels = c(unique(vgg$category), "P.tricarunculatus-Monteverde", "P.tricarunculatus-Nicaragua", "P.tricarunculatus-Panama"))
+vgg$pred <- factor(vgg$pred)
+
+conf_mat <- confusionMatrix(data = vgg$pred, reference = vgg$category)
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(vgg$category == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+conf_df <- conf_df[complete.cases(conf_df), ]
+
+ggplot(conf_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    labs(x = "Manually labeled category", y = "Predicted category") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+round(conf_mat$overall, 3)
+
+```
+
+## Model trained collapsing all bellbird dialects into a single category
+### Test data
+```{r vgg results no dialects, eval = TRUE}
+
+vgg <- read.csv("./data/processed/turicreate_results_test_no_dialects.csv")
+
+vgg$category <- factor(vgg$categorynd)
+vgg$pred <- factor(vgg$pred)
+
+conf_mat <- confusionMatrix(data = vgg$pred, reference = vgg$category)
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(vgg$category == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+conf_df <- conf_df[complete.cases(conf_df), ]
+
+ggplot(conf_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    labs(x = "Manually labeled category", y = "Predicted category") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+round(conf_mat$overall, 3)
+```
+
+### Mimetic bellbird
+```{r vgg results mimetic bellbird no dialects, eval = TRUE}
+
+vgg <- read.csv("./data/processed/turicreate_results_mimetic_no_dialects.csv")
+
+# vgg$category <- factor(vgg$category, levels = c(unique(vgg$category), "P.tricarunculatus-Monteverde", "P.tricarunculatus-Nicaragua", "P.tricarunculatus-Panama"))
+vgg$category <- factor(vgg$categorynd)
+vgg$pred <- factor(vgg$prednd)
+
+conf_mat <- confusionMatrix(data = vgg$pred, reference = vgg$category)
+
+conf_df <- as.data.frame(conf_mat$table)
+
+conf_df$total <- sapply(conf_df$Reference, function(x) sum(vgg$category == x))
+
+conf_df$proportion <- conf_df$Freq / conf_df$total
+
+conf_df <- conf_df[complete.cases(conf_df), ]
+
+ggplot(conf_df, aes(x = Reference, y = Prediction, fill = proportion)) +
+  geom_tile() + theme_bw() + coord_equal() +
+  scale_fill_distiller(palette="Greens", direction=1) + 
+    geom_text(aes(label=round(proportion, 2)), color="black") +
+    labs(x = "Manually labeled category", y = "Predicted category") +
+    theme_classic() +
+    theme(axis.text.x=element_text(color = "black", size=11, angle=30, vjust=.8, hjust=0.8)) 
+
+round(conf_mat$overall, 3)
+
+```
+
+
+```{r predicted species through time, eval = TRUE, out.width="%100"}
+
+rec_info <- read.table("./data/raw/Recording_dates_.csv", head = TRUE, sep = ";")
+
+# rec_info$date <- gsub("ago", "aug", rec_info$date) 
+# rec_info$date <- gsub("abr", "apr", rec_info$date) 
+# 
+# unique(rec_info$date)
+
+rec_info$date <- as.Date(rec_info$date, format = "%d-%b-%y")
+
+
+vgg$sound.files <- paste0(sapply(strsplit(as.character(vgg$filename), ".wav", fixed = TRUE), "[", 1), ".wav")
+
+vgg$date <- sapply(1:nrow(vgg), function(x) as.character(rec_info$date[rec_info$sound.files == vgg$sound.files[x]][1]))
+
+vgg$date <- as.Date(vgg$date)
+
+agg_pred <- aggregate(sound.files ~ date + prednd, vgg, length)
+
+ggplot(data = agg_pred, aes(x = date, y = sound.files, fill = prednd, group = prednd)) +
+    geom_bar(stat = "identity", position="dodge", width = 2) +
+    scale_fill_viridis_d(begin = 0.1, end = 0.9) +
+    labs(x = "Date", y = "Vocalization count", fill = "Predicted species") +
+    theme_classic()
+```
+
+
+## Acoustic space
+```{r acoustic space, eval = TRUE}
+
+probs <- read.table("./data/processed/turicreate_proabilities_test_and_train_no_dialects.csv", head = FALSE, sep = " ")
+
+preds <- read.csv("./data/processed/turicreate_predictions_test_and_train_no_dialects.csv")
+
+
+probs$V1 <- gsub("\\[|\\]", "", probs$V1)
+
+probs <- as.numeric(c(unlist(strsplit(probs$V1, " "))))
+
+
+prob_mat <- matrix(probs, ncol = 4, byrow = TRUE)
+
+model_pred_prob <- cbind(preds, prob_mat)
+
+model_pred_prob$X1 <- NULL
+
+pca <- prcomp(model_pred_prob[, c("1", "2", "3", "4")])
+
+pred_pca <- cbind(preds, pca$x[, 1:2])
+
+
+mimetic_probs <- read.table("./data/processed/turicreate_probabilities_mimetic_no_dialects.csv", head = FALSE, sep = " ")
+
+
+mimetic_probs$V1 <- gsub("\\[|\\]", "", mimetic_probs$V1)
+
+mimetic_probs <- as.numeric(c(unlist(strsplit(mimetic_probs$V1, " "))))
+mimetic_probs_mat <- matrix(mimetic_probs, ncol = 4, byrow = TRUE)
+
+mimetic_preds <- read.csv("./data/processed/turicreate_results_mimetic_no_dialects.csv")
+
+mimetic_pred_prob <- cbind(mimetic_preds, mimetic_probs_mat)
+
+pca_mimetic <- predict(pca, newdata = mimetic_pred_prob)
+
+mimetic_pred_pca <- cbind(mimetic_preds, pca_mimetic[, 1:2])
+
+all_pca <- rbind(mimetic_pred_pca, pred_pca)
+
+all_pca$categorynd[all_pca$foldnd == "mimetic"] <- "Mimetic bird"
+
+all_pca$categorynd <-factor(all_pca$categorynd, levels = c("P.torquatus", "R.sulfuratus", "P.tricarunculatus", "P.montezuma", "Mimetic bird"))
+
+ggplot(all_pca[all_pca$foldnd != "mimetic", ] , aes(x = PC1, y = PC2, color = categorynd, shape = categorynd)) +
+    geom_jitter(size = 4, width = 0.04, height = 0.04) +
+    scale_shape_manual(values = c(25:22)) +
+    scale_color_viridis_d(begin = 0.2, end = 0.8, alpha = 0.3) +
+    theme_classic() +
+    ggtitle("Only model species vocalizations")
+
+ggplot(all_pca[all_pca$foldnd == "test", ] , aes(x = PC1, y = PC2, color = categorynd, shape = categorynd)) +
+    geom_jitter(size = 4, width = 0.04, height = 0.04) +
+     scale_shape_manual(values = c(25:22)) +
+    scale_color_viridis_d(begin = 0.2, end = 0.8, alpha = 0.5) +
+    theme_classic() +
+    ggtitle("Model species test data set")
+
+
+ggplot(all_pca[all_pca$foldnd == "test", ] , aes(x = PC1, y = PC2, color = categorynd, shape = categorynd)) +
+    geom_jitter(size = 4, width = 0.04, height = 0.04) +
+     scale_shape_manual(values = c(25:22)) +
+    scale_color_viridis_d(begin = 0.2, end = 0.8, alpha = 0.5) +
+    geom_point(data = all_pca[all_pca$foldnd == "mimetic", ], mapping = aes(x = PC1, y = PC2), color = "black", shape = 21) +
+    theme_classic() +
+   ggtitle("Model species test and mimetic bellbird")
+
+   
+ggplot(all_pca[all_pca$foldnd == "test", ] , aes(x = PC1, y = PC2, shape = categorynd)) +
+    geom_jitter(size = 4, width = 0.04, height = 0.04, color = "gray", alpha = 0.4) +
+     scale_shape_manual(values = c(25:22)) +
+    geom_point(data = all_pca[all_pca$foldnd == "mimetic", ], mapping = aes(x = PC1, y = PC2), color = "black", shape = 21) +
+    theme_classic() +
+   ggtitle("Model species test and mimetic bellbird")
+
+ggplot(all_pca[all_pca$foldnd == "mimetic", ], aes(x = PC1, y = PC2, color = categorynd, shape = categorynd, size = categorynd)) +
+    geom_jitter(width = 0.02, height = 0.02) +
+    scale_shape_manual(values = 21) +
+    scale_color_manual(values =4) +
+     scale_size_manual(values =2) +
+    # scale_fill_manual(values =c(viridis(4, begin = 0.2, end = 0.8, alpha = 0.3), "transparent")) +
+    theme_classic() +
+    ggtitle("Only mimetic bellbird")
+
+```
+
+---
+
+
+
+
+
+
+<!-- light green box -->
+
+<div class="alert alert-success">
+
+&nbsp; 
+
+# Takeaways
+
+- Good performance of the classification model on test data and vocalizations from the mimetic bellbird
+
+</div>
+
+&nbsp;
+
+<div class="alert alert-info">
+
+# Sum up results
+
+-  
+
+</div>
+
+&nbsp; 
+---
+
+
+<font size="4">Session information</font>
+
+```{r session info, echo=F, eval = TRUE}
+
+sessionInfo()
+
+```
