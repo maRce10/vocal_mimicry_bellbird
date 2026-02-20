@@ -1,0 +1,2 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Vocalization	Song
+1	Spectrogram 1	1	2.626100000	2.894120378	3330.798	5520.913	INVEST_0191.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Archivos Campana Bosque Alegre\26-04-2020\Audios\INVEST_0191.wav	2.6261	Focal	Pteroglossus torquatus		

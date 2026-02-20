@@ -1,0 +1,4 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Vocalization	Song
+1	Spectrogram 1	1	18.557780168	18.895314018	1173.8	2096.0	Campan_0108.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Archivos Campana Bosque Alegre\27-10-2020\Audios\Campan_0108.wav	18.5578	Focal	Procnias tricarunculatus		1
+2	Spectrogram 1	1	31.241950872	31.495101259	1173.8	1928.3	Campan_0108.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Archivos Campana Bosque Alegre\27-10-2020\Audios\Campan_0108.wav	31.2420	Focal	Procnias tricarunculatus		1
+3	Spectrogram 1	1	32.057657675	32.338935883	1131.8	2054.1	Campan_0108.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Archivos Campana Bosque Alegre\27-10-2020\Audios\Campan_0108.wav	32.0577	Focal			1

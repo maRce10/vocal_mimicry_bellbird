@@ -1,0 +1,11 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Song
+1	Spectrogram 1	1	5.782790954	6.064799964	1758.9	7631.2	Pteroglossus-torquatus-154157_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Pteroglossus-torquatus-154157_.wav	5.7828	Model	Pteroglossus torquatus	1
+2	Spectrogram 1	1	6.727551301	7.015160371	1645.4	7035.5	Pteroglossus-torquatus-154157_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Pteroglossus-torquatus-154157_.wav	6.7276	Model	Pteroglossus torquatus	2
+3	Spectrogram 1	1	7.577873770	7.840473356	1758.9	7063.8	Pteroglossus-torquatus-154157_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Pteroglossus-torquatus-154157_.wav	7.5779	Model	Pteroglossus torquatus	3
+4	Spectrogram 1	1	8.240625106	8.503224692	1929.1	7063.8	Pteroglossus-torquatus-154157_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Pteroglossus-torquatus-154157_.wav	8.2406	Model	Pteroglossus torquatus	4
+5	Spectrogram 1	1	8.965900154	9.203490255	1787.2	7120.6	Pteroglossus-torquatus-154157_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Pteroglossus-torquatus-154157_.wav	8.9659	Model	Pteroglossus torquatus	5
+6	Spectrogram 1	1	9.691175201	9.941270045	1900.7	6950.4	Pteroglossus-torquatus-154157_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Pteroglossus-torquatus-154157_.wav	9.6912	Model	Pteroglossus torquatus	6
+7	Spectrogram 1	1	10.804097256	11.116715811	2014.2	6836.9	Pteroglossus-torquatus-154157_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Pteroglossus-torquatus-154157_.wav	10.8041	Model	Pteroglossus torquatus	7
+8	Spectrogram 1	1	12.827151277	13.164779317	2156.0	6978.7	Pteroglossus-torquatus-154157_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Pteroglossus-torquatus-154157_.wav	12.8272	Model	Pteroglossus torquatus	8
+9	Spectrogram 1	1	14.277701372	14.565310442	1787.2	7063.8	Pteroglossus-torquatus-154157_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Pteroglossus-torquatus-154157_.wav	14.2777	Model	Pteroglossus torquatus	9
+10	Spectrogram 1	1	16.278460123	16.566069194	1673.8	6865.2	Pteroglossus-torquatus-154157_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Pteroglossus-torquatus-154157_.wav	16.2785	Model	Pteroglossus torquatus	10

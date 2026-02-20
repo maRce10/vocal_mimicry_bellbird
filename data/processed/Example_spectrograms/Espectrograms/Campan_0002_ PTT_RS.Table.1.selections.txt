@@ -1,0 +1,2 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Vocalization
+1	Spectrogram 1	1	8.768178066	8.904084204	1186.8	3791.2	Campan_0002_ PTT_RS.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0002_ PTT_RS.wav	8.7682			

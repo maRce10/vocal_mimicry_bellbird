@@ -1,0 +1,3 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Vocalization	Song
+1	Spectrogram 1	1	0.992783285	1.115468157	4699.620	6250.951	20200805-063013.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Archivos Campana Bosque Alegre\05-08-2020\Conversion\20200805-063013.wav	0.9928	Pteroglossus torquatus	Pteroglossus torquatus		1
+2	Spectrogram 1	1	12.532542040	12.783526578	4152.091	6114.068	20200805-063013.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Archivos Campana Bosque Alegre\05-08-2020\Conversion\20200805-063013.wav	12.5325	Pteroglossus torquatus	Pteroglossus torquatus		2

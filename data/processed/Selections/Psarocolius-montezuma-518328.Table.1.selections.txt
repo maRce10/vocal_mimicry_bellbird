@@ -1,0 +1,3 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Vocalization	Song
+1	Spectrogram 1	1	2.085683363	2.819110480	456.3	8714.8	Psarocolius-montezuma-518328.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Audios Models Species\Psarocolius-montezuma-518328.wav	2.0857	Psarocolius montezuma	Psarocolius montezuma		1
+2	Spectrogram 1	1	22.667481829	23.996818479	319.4	8669.2	Psarocolius-montezuma-518328.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Audios Models Species\Psarocolius-montezuma-518328.wav	22.6675	Psarocolius montezuma	Psarocolius montezuma		2

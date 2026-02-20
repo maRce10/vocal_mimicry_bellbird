@@ -1,0 +1,7 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Song
+1	Spectrogram 1	1	0.377094138	1.649786854	489.1	7402.2	Psarocolius-montezuma-576623_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Psarocolius-montezuma-576623_.wav	0.3771	Model	Psarocolius montezuma	1
+2	Spectrogram 1	1	8.657452918	9.804447588	456.5	7337.0	Psarocolius-montezuma-576623_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Psarocolius-montezuma-576623_.wav	8.6575	Model	Psarocolius montezuma	2
+3	Spectrogram 1	1	16.802330976	18.169297226	489.1	7402.2	Psarocolius-montezuma-576623_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Psarocolius-montezuma-576623_.wav	16.8023	Model	Psarocolius montezuma	3
+4	Spectrogram 1	1	22.572049412	24.001864685	684.8	7500.0	Psarocolius-montezuma-576623_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Psarocolius-montezuma-576623_.wav	22.5720	Model	Psarocolius montezuma	4
+5	Spectrogram 1	1	27.879945869	29.356897910	456.5	7206.5	Psarocolius-montezuma-576623_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Psarocolius-montezuma-576623_.wav	27.8799	Model	Psarocolius montezuma	5
+6	Spectrogram 1	1	36.582876381	37.886993608	391.3	7467.4	Psarocolius-montezuma-576623_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Psarocolius-montezuma-576623_.wav	36.5829	Model	Psarocolius montezuma	6

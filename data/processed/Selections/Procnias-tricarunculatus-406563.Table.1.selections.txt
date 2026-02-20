@@ -1,0 +1,3 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Vocalization	Song
+1	Spectrogram 1	1	0.363365167	0.669356886	1089.9	1509.1	Procnias-tricarunculatus-406563.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Audios Campana Marcelo\Procnias-tricarunculatus-406563.wav	0.3634	Procnias tricarunculatus	Procnias tricarunculatus	Monteverde	1
+2	Spectrogram 1	1	3.212913054	3.442406843	1048.0	1467.2	Procnias-tricarunculatus-406563.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Audios Campana Marcelo\Procnias-tricarunculatus-406563.wav	3.2129	Procnias tricarunculatus	Procnias tricarunculatus	Monteverde	

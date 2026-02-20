@@ -1,0 +1,8 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Song
+1	Spectrogram 1	1	1.205270634	1.559761997	1896.4	5409.3	Campan_0117_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0117_PT.wav	1.2053	Focal	Pteroglossus torquatus	1
+2	Spectrogram 1	1	4.271620923	4.537489445	2456.0	5471.5	Campan_0117_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0117_PT.wav	4.2716	Focal	Pteroglossus torquatus	2
+3	Spectrogram 1	1	4.891980808	5.157849331	2580.3	5720.2	Campan_0117_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0117_PT.wav	4.8920	Focal	Pteroglossus torquatus	3
+4	Spectrogram 1	1	6.309946260	6.682162191	2549.2	5844.6	Campan_0117_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0117_PT.wav	6.3099	Focal	Pteroglossus torquatus	4
+5	Spectrogram 1	1	7.001204418	7.284797508	2424.9	5782.4	Campan_0117_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0117_PT.wav	7.0012	Focal	Pteroglossus torquatus	5
+6	Spectrogram 1	1	7.621564303	7.922881961	2735.8	5285.0	Campan_0117_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0117_PT.wav	7.6216	Focal	Pteroglossus torquatus	6
+7	Spectrogram 1	1	8.153301347	8.490068142	3886.0	6093.3	Campan_0117_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0117_PT.wav	8.1533	Focal	Pteroglossus torquatus	7

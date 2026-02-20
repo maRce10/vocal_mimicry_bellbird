@@ -1,0 +1,3 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Vocalization
+1	Spectrogram 1	1	17.680098942	18.022294405	1657.4	10016.2	Campan_0107.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Archivos Campana Bosque Alegre\27-10-2020\Campan_0107.wav	17.6801	Focal	Pteroglossus torquatus	
+2	Spectrogram 1	1	16.026154202	16.339833377	1225.0	8935.3	Campan_0107.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Archivos Campana Bosque Alegre\27-10-2020\Campan_0107.wav	16.0262	Focal	Pteroglossus torquatus	

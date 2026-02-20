@@ -1,0 +1,6 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Song
+1	Spectrogram 1	1	15.931271417	16.216114246	1053.4	3618.3	Campan_0009_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0009_PTT.wav	15.9313	Focal	Procnias tricarunculatus	1
+2	Spectrogram 1	1	16.734935114	17.009604985	1282.4	3251.9	Campan_0009_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0009_PTT.wav	16.7349	Focal	Procnias tricarunculatus	1
+3	Spectrogram 1	1	17.436869229	17.619982477	1603.1	3709.9	Campan_0009_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0009_PTT.wav	17.4369	Focal	Procnias tricarunculatus	1
+4	Spectrogram 1	1	18.210014052	18.474510965	1557.3	3664.1	Campan_0009_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0009_PTT.wav	18.2100	Focal	Procnias tricarunculatus	1
+5	Spectrogram 1	1	32.464557935	32.749400765	916.0	2244.3	Campan_0009_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0009_PTT.wav	32.4646	Focal	Procnias tricarunculatus	2

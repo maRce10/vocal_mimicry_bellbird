@@ -1,0 +1,7 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Song
+1	Spectrogram 1	1	11.938311006	12.095239510	1813.6	3206.3	Campan_0035_RS.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0035_RS.wav	11.9383	Focal	Ramphastos sulfuratus	1
+2	Spectrogram 1	1	12.548588522	12.775263028	1360.2	2979.6	Campan_0035_RS.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0035_RS.wav	12.5486	Focal	Ramphastos sulfuratus	2
+3	Spectrogram 1	1	13.263485041	13.559905548	1327.8	2590.9	Campan_0035_RS.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0035_RS.wav	13.2635	Focal	Ramphastos sulfuratus	3
+4	Spectrogram 1	1	13.934790308	14.222492565	1327.8	2558.5	Campan_0035_RS.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0035_RS.wav	13.9348	Focal	Ramphastos sulfuratus	4
+5	Spectrogram 1	1	14.579940825	14.797897080	1392.6	2720.5	Campan_0035_RS.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0035_RS.wav	14.5799	Focal	Ramphastos sulfuratus	5
+6	Spectrogram 1	1	15.198936591	15.451765847	1295.5	2817.6	Campan_0035_RS.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0035_RS.wav	15.1989	Focal		6

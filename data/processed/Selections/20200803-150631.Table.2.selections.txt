@@ -1,0 +1,2 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Delta Time (s)	Delta Freq (Hz)	Peak Amp (U)	Recording	Model species	Vocalization	Song	From
+1	Spectrogram 1	1	37.557500000	37.772292496	1688.200	5977.200	0.2148	4289.000		Focal	Procnias tricarunculatus		3	Table 1

@@ -1,0 +1,292 @@
+---
+title: <center><font size="7"><b>Statistical analysis</b></font></center>
+subtitle: <center><font size="4"><b>Bellbird vocal mimicry</b> <br> Your Organization</font></center>
+author: <center><font size="3"><a href="https://marceloarayasalas.weebly.com/">Marcelo Araya-Salas</a> & Pablo Huertas</font></center>
+date: <center>"`r Sys.Date()`"</center>
+output:
+  html_document:
+    code_folding: hide
+    # css: extra.css
+    df_print: tibble
+    highlight: pygments  
+    toc: yes
+    toc_depth: 3
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+fontsize: 12pt 
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r load packages, echo = FALSE, message = FALSE, warning=FALSE}
+
+# remotes::install_github("rlesur/klippy")
+
+# github packages must include user name ("user/package")
+pkgs <- c("rlesur/klippy", "kableExtra", "knitr", "remotes", "maRce10/warbleR", "Rraven", "viridis", "ggplot2", "formatR", "ranger", "tuneRanger", "soundgen", "smacof", "caret", "Sim.DiffProc")
+
+# install/ load packages
+out <- lapply(pkgs, function(y) {
+  
+  # get pakage name
+  pkg <- strsplit(y, "/")[[1]]
+  pkg <- pkg[length(pkg)]
+  
+  # check if installed, if not then install 
+  if (!pkg %in% installed.packages()[,"Package"])  {
+
+      if (grepl("/", y))  remotes::install_github(y, force = TRUE) else
+    install.packages(y) 
+    }
+
+  # load package
+  a <- try(require(pkg, character.only = T), silent = T)
+
+  if (!a) remove.packages(pkg)
+  })
+
+
+```
+
+
+```{r setup, include = FALSE, eval = TRUE}
+
+opts_knit$set(root.dir = "..")
+
+knitr::opts_chunk$set(
+  tidy.opts = list(width.cutoff = 65), 
+  tidy = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  eval = FALSE
+ )
+
+```
+
+```{r custom data frame printing, echo = FALSE}
+
+# this is a customized printing for data frames 
+# screws up tibble function
+tibble <- function(x, ...) { 
+  x <- kbl(x, digits=4, align= 'c', row.names = FALSE) 
+   x <- kable_styling(x, position ="center", full_width = FALSE,  bootstrap_options = c("striped", "hover", "condensed", "responsive")) 
+   asis_output(x)
+}
+
+registerS3method("knit_print", "data.frame", tibble)
+
+```
+
+
+```{r klippy, echo=FALSE, include=TRUE}
+
+# to add copy button to code blocks
+klippy::klippy(position = c('top', 'right'))
+
+```
+
+&nbsp; 
+
+<!-- skyblue box -->
+
+<div class="alert alert-info">
+
+# Purpose
+
+- The first goal of this report
+
+- The second goal of this report
+
+</div>
+
+&nbsp; 
+
+<!-- light brown box -->
+
+
+<div class="alert alert-warning">
+
+# Report overview
+
+- You can have the sections listed here, for instance:
+
+  - [Takeaways](#takeaways)
+
+</div>
+
+&nbsp;
+
+
+## Measure acoustic parameters feature extraction
+
+Vocalization column has the info about the sound that were made by the mimetic bellbird and the dialect
+
+```{r}
+warbleR_options(wav.path = "./data/raw/recordings/consolidated_files")
+
+sels <- read.csv("./data/processed/pooled_annotations.csv")
+
+sels_snr <- sig2noise(sels, mar = 0.05, parallel = 10)
+
+sum(sels_snr$SNR >= 2) / nrow(sels_snr)
+
+# keep only those that are mimetic or are models with SNR >= 2
+high_snr_sels <- sels[sels_snr$SNR >= 2 & !grepl("mimetic", sels$species.vocalization) | grepl("mimetic", sels$species.vocalization), ]
+
+high_snr_est <- selection_table(high_snr_sels, extended = TRUE, confirm.extended = FALSE, mar = 0.05, parallel = 10)
+
+table(attr(high_snr_est, "check.res")$sample.rate)
+
+high_snr_est <- resample_est_waves(high_snr_est, samp.rate = 44.1, bit.depth = 16, parallel = 10)
+
+saveRDS(high_snr_est, "./data/processed/extended_selection_table_high_snr_models_and_allmimetic_sounds.RDS")
+
+```
+
+
+```{r measure acoustic parameters}
+
+high_snr_est <- readRDS("./data/processed/extended_selection_table_high_snr_models_and_allmimetic_sounds.RDS")
+
+sp_param <- spectro_analysis(high_snr_est, parallel = 14)
+
+sp_param$species.vocalization <- high_snr_est$species.vocalization
+
+write.csv(sp_param, "./data/processed/acoustic_parameters_model_and_mimetic.csv", row.names = FALSE)
+
+mel_param <- mfcc_stats(high_snr_est, parallel = 4)
+
+mel_param$species.vocalization <- high_snr_est$species.vocalization
+
+write.csv(mel_param, "./data/processed/mfcc_stats_model_and_mimetic.csv", row.names = FALSE)
+
+
+```
+
+```{r train random forest spectral parameters}
+
+sp_param <- read.csv("acoustic_parameters_model_and_mimetic.csv")
+
+model_sp_param <- sp_param[grep("mimetic", sp_param$species.vocalization, invert = TRUE), ]
+
+# remove babbling due to low sample size (16)
+model_sp_param <- model_sp_param[model_sp_param$species.vocalization != "P.tricarunculatus-babbling", ]
+
+# table(model_sp_param$species.vocalization)
+
+# tune random forest
+rf_task <- makeClassifTask(data = model_sp_param[, -c(1, 2)], target = "species.vocalization")
+ 
+# Estimate runtime
+estimateTimeTuneRanger(rf_task)
+
+# Tuning
+tuning.results <- tuneRanger(rf_task, measure = list(multiclass.brier), num.trees = 10000, num.threads = 10, iters = 1000, save.file.path = NULL, show.info = FALSE)
+  
+# Model with the new tuned hyperparameters
+rf <- ranger(as.factor(species.vocalization) ~ ., data = model_sp_param[, -c(1, 2)], num.trees = 10000, importance = "impurity", keep.inbag = TRUE, mtry = tuning.results$recommended.pars$mtry, min.node.size = tuning.results$recommended.pars$min.node.size, sample.fraction = tuning.results$recommended.pars$sample.fraction)
+
+rf$prediction.error
+
+prx.mat <- extract_proximity_oob(fit = rf, olddata = model_sp_param)
+
+diss <- dist(t(prx.mat))   ## Euclidean distances 
+fit <- mds(diss, ndim = 2)        ## 2D interval MDS
+
+set.seed(123)
+rf.mds.boot <- bootmds(fit, prx.mat, method.dat = "euclidean", nrep = 50)
+rf.mds <- cmdscale(prx.mat, k = 2)
+  
+  
+saveRDS(list(rf = rf, rf.mds.boot = rf.mds.boot, rf.mds = rf.mds, labels =  model_sp_param$species.vocalization), "./data/processed/random_forest_model_and_mds.RDS")
+
+```
+
+```{r, visualize random forest space, eval = TRUE, out.width ="100%"}
+
+attach(readRDS("./data/processed/random_forest_model_and_mds.RDS"))
+
+mds.shp.boot <- data.frame(species.vocalization = labels, rf.mds.boot$conf, stringsAsFactors = FALSE)
+
+ggplot(mds.shp.boot, aes(x = D1, y = D2, color = species.vocalization, shape = species.vocalization)) +
+ geom_point(size = 7)+
+  scale_color_viridis_d() +
+  theme_classic() +
+  labs(title = "Bootstrapped MDS", x = "Dimension 1", y = "Dimension 2", color = "Predicted class", shape = "Predicted class") +
+  theme(text = element_text(size=20), legend.text = element_text(face="italic")) 
+
+# remove outliers
+mds.shp <- data.frame(species.vocalization = labels, rf.mds, stringsAsFactors = FALSE)
+names(mds.shp)
+ 
+mds.shp <- mds.shp[mds.shp$X1 < 0.2 & mds.shp$X2 < 0.2, ]
+
+ggplot(mds.shp, aes(x = X1, y = X2, color = species.vocalization, shape = species.vocalization)) +
+ geom_point(size = 7)+
+  scale_color_viridis_d() +
+  theme_classic() +
+  labs(title = "Regular MDS", x = "Dimension 1", y = "Dimension 2", color = "Predicted class", shape = "Predicted class") +
+  theme(text = element_text(size=20), legend.text = element_text(face="italic")) 
+
+```
+
+```{r predict mimetic sounds, eval = TRUE}
+
+sp_param <- read.csv("./data/processed/acoustic_parameters_model_and_mimetic.csv")
+
+mimetic_sp_param <- sp_param[grep("mimetic", sp_param$species.vocalization), ]
+
+mimetic_sp_param$pred.class <- as.character(predict(object = rf, data = mimetic_sp_param)$predictions)
+
+# table(mimetic_sp_param$pred.class)
+# table(mimetic_sp_param$species.vocalization)
+# table(mimetic_sp_param$pred.class, mimetic_sp_param$species.vocalization)
+
+mimetic_no_calls <- mimetic_sp_param[!mimetic_sp_param$species.vocalization %in% c("mimetic_P.tricarunculatus-babbling", "mimetic_P.tricarunculatus-aggresive", "mimetic_P.tricarunculatus-whistle"), ]
+
+mimetic_no_calls$pred.class[grep("tricarun", mimetic_no_calls$pred.class)] <- "P.tricarunculatus" 
+
+# table(mimetic_no_calls$pred.class, mimetic_no_calls$species.vocalization)
+
+mimetic_no_calls$pred.class[grep("montezuma", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("montezuma", mimetic_no_calls$species.vocalization)] <- "P.montezuma"
+
+mimetic_no_calls$pred.class[grep("torquatus", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("torquatus", mimetic_no_calls$species.vocalization)] <- "P.torquatus"
+
+mimetic_no_calls$pred.class[grep("sulfuratus", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("sulfuratus", mimetic_no_calls$species.vocalization)] <- "R.sulfuratus"
+
+mimetic_no_calls$pred.class[grep("tricarunculatus", mimetic_no_calls$pred.class)] <- mimetic_no_calls$species.vocalization[grep("tricarunculatus", mimetic_no_calls$species.vocalization)] <- "P.tricarunculatus"
+
+confusionMatrix(data = as.factor(mimetic_no_calls$pred.class), reference = as.factor(mimetic_no_calls$species.vocalization))
+
+```
+
+
+
+<!-- light green box -->
+
+<div class="alert alert-success">
+
+&nbsp; 
+
+# Takeaways
+
+</div>
+
+&nbsp;
+
+<!-- '---' adds a gray vertical line -->
+
+---
+
+&nbsp; 
+ 
+ <!-- add packages used, system details and versions  -->
+ 
+<font size="4">Session information</font>
+
+```{r session info, echo=F}
+
+sessionInfo()
+
+```

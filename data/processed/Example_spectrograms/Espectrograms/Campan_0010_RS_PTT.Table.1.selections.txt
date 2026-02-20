@@ -1,0 +1,20 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Vocalization
+1	Spectrogram 1	2	3.337291882	3.590757088	1443.8	2558.2	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	3.3373	Focal	Ramphastos sulfuratus	1
+2	Spectrogram 1	2	3.894915335	4.148380542	1393.1	2406.3	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	3.8949	Focal	Ramphastos sulfuratus	2
+3	Spectrogram 1	2	4.528578351	4.756697037	1443.8	2380.9	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	4.5286	Focal	Ramphastos sulfuratus	3
+4	Spectrogram 1	2	5.221383248	5.508643815	1393.1	2684.9	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	5.2214	Focal	Ramphastos sulfuratus	4
+5	Spectrogram 1	2	5.871943944	6.049369588	1393.1	2431.6	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	5.8719	Focal	Ramphastos sulfuratus	5
+6	Spectrogram 1	2	6.573197681	6.826662887	1393.1	2507.6	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	6.5732	Focal	Ramphastos sulfuratus	6
+7	Spectrogram 1	2	7.291349099	7.460325903	1342.4	2431.6	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	7.2913	Focal	Ramphastos sulfuratus	7
+8	Spectrogram 1	2	7.882767913	8.110886599	1443.8	2203.6	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	7.8828	Focal	Ramphastos sulfuratus	8
+9	Spectrogram 1	2	8.448840207	8.643163532	1342.4	2153.0	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	8.4488	Focal	Ramphastos sulfuratus	9
+10	Spectrogram 1	2	9.116298584	9.352866109	1393.1	2406.3	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	9.1163	Focal	Ramphastos sulfuratus	10
+11	Spectrogram 1	2	9.758410439	10.037222166	1317.1	2178.3	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	9.7584	Focal	Ramphastos sulfuratus	11
+12	Spectrogram 1	2	10.381073894	10.642987940	1418.4	2229.0	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	10.3811	Focal	Ramphastos sulfuratus	12
+13	Spectrogram 1	2	10.997839229	11.259753275	1393.1	2254.3	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	10.9978	Focal	Ramphastos sulfuratus	13
+14	Spectrogram 1	2	24.730819722	24.967387248	1013.2	2229.0	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	24.7308	Focal	Procnias tricarunculatus	14
+15	Spectrogram 1	2	25.465868820	25.677089825	1570.4	2684.9	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	25.4659	Focal	Procnias tricarunculatus	14
+16	Spectrogram 1	2	26.293855160	26.521973846	1899.7	3064.8	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	26.2939	Focal	Procnias tricarunculatus	14
+17	Spectrogram 1	2	26.944415856	27.138739181	1519.8	2735.6	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	26.9444	Focal	Procnias tricarunculatus	14
+18	Spectrogram 1	2	27.240125263	27.696362634	3647.4	4939.2	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	27.2401	Focal	Procnias tricarunculatus	14
+19	Spectrogram 1	2	33.843769292	34.080336818	962.5	2102.3	Campan_0010_RS_PTT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0010_RS_PTT.wav	33.8438	Focal	Procnias tricarunculatus	15

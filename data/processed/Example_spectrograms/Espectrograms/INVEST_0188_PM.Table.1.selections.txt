@@ -1,0 +1,2 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Song
+1	Spectrogram 1	1	26.455210061	27.424479942	183.2	4580.2	INVEST_0188_PM.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\INVEST_0188_PM.wav	26.4552	Focal	Psarocolius montezuma	1

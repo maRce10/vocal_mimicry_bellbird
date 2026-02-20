@@ -1,2 +1,4 @@
 packrat/lib*/
 .Rproj.user
+data/processed/extended_selection_table_high_snr_models_and_allmimetic_sounds.RDS
+data/raw/recordings

@@ -1,0 +1,3 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Vocalization
+1	Spectrogram 1	1	12.343247242	12.698083918	1641.3	10026.0	Campan_0115.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Archivos Campana Bosque Alegre\27-10-2020\Campan_0115.wav	12.3432	Focal	Ramphastos sulfuratus	
+2	Spectrogram 1	1	13.255684410	13.509139179	1248.8	9883.3	Campan_0115.wav	C:\Users\Pablo\Documents\Proyect Campana Mimicry\Proyecto Pájaro Campana 29-9-2020\Archivos Campana Bosque Alegre\27-10-2020\Campan_0115.wav	13.2557	Focal	Ramphastos sulfuratus	

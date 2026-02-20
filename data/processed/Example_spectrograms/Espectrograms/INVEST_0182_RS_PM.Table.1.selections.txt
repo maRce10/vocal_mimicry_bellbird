@@ -1,0 +1,8 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Song
+1	Spectrogram 1	1	0.883165693	1.140377519	1290.3	2208.8	INVEST_0182_RS_PM.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\INVEST_0182_RS_PM.wav	0.8832	Focal	Ramphastos sulfuratus	1
+2	Spectrogram 1	1	1.484300897	1.755819354	1268.4	2383.8	INVEST_0182_RS_PM.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\INVEST_0182_RS_PM.wav	1.4843	Focal	Ramphastos sulfuratus	2
+3	Spectrogram 1	1	3.750254321	5.222197143	918.5	5861.0	INVEST_0182_RS_PM.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\INVEST_0182_RS_PM.wav	3.7503	Focal	Psarocolius montezuma	3
+4	Spectrogram 1	1	14.138218506	14.304612042	1290.3	2143.2	INVEST_0182_RS_PM.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\INVEST_0182_RS_PM.wav	14.1382	Focal	Ramphastos sulfuratus	4
+5	Spectrogram 1	1	17.568485257	17.760477799	2405.6	5292.4	INVEST_0182_RS_PM.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\INVEST_0182_RS_PM.wav	17.5685	Focal	Pteroglossus torquatus	5
+6	Spectrogram 1	1	18.323655922	18.515648464	2777.4	5073.7	INVEST_0182_RS_PM.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\INVEST_0182_RS_PM.wav	18.3237	Focal	Pteroglossus torquatus	6
+7	Spectrogram 1	1	19.872395761	20.077187806	1771.4	4855.0	INVEST_0182_RS_PM.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\INVEST_0182_RS_PM.wav	19.8724	Focal	Pteroglossus torquatus	7

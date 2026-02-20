@@ -1,0 +1,16 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Song
+14	Spectrogram 1	1	29.220611448	29.551876539	4000.0	5705.4	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	29.2206	Focal	Pteroglossus torquatus	14
+15	Spectrogram 1	1	29.793954875	30.252629616	4062.0	5209.3	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	29.7940	Focal	Pteroglossus torquatus	15
+1	Spectrogram 1	1	17.106589050	17.335926421	1240.3	2325.6	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	17.1066	Focal	Ramphastos sulfuratus	1
+2	Spectrogram 1	1	17.756378267	17.947492742	1271.3	2201.6	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	17.7564	Focal	Ramphastos sulfuratus	2
+3	Spectrogram 1	1	18.418908449	18.610022924	1581.4	2604.7	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	18.4189	Focal	Ramphastos sulfuratus	3
+4	Spectrogram 1	1	19.208848281	19.476408547	1333.3	2480.6	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	19.2088	Focal	Ramphastos sulfuratus	4
+5	Spectrogram 1	1	19.871378463	20.138938729	1364.3	2759.7	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	19.8714	Focal	Ramphastos sulfuratus	5
+6	Spectrogram 1	1	20.508426715	20.839691806	1271.3	2511.6	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	20.5084	Focal	Ramphastos sulfuratus	6
+7	Spectrogram 1	1	21.234661722	21.527703918	1178.3	2139.5	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	21.2347	Focal	Ramphastos sulfuratus	7
+8	Spectrogram 1	1	21.858969008	22.177493134	1271.3	2139.5	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	21.8590	Focal	Ramphastos sulfuratus	8
+9	Spectrogram 1	1	22.687131736	22.890987176	1426.4	2232.6	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	22.6871	Focal	Ramphastos sulfuratus	9
+10	Spectrogram 1	1	23.349661918	23.629963149	1271.3	2418.6	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	23.3497	Focal	Ramphastos sulfuratus	10
+11	Spectrogram 1	1	24.203306575	24.470866841	1209.3	2604.7	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	24.2033	Focal	Ramphastos sulfuratus	11
+12	Spectrogram 1	1	24.916800617	25.184360883	1209.3	2139.5	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	24.9168	Focal	Ramphastos sulfuratus	12
+13	Spectrogram 1	1	25.604812729	25.885113960	1488.4	2356.6	Campan_0013_RS_PT.wav	C:\Users\Pablo\Desktop\Modelo de sp\Mimicry\Campan_0013_RS_PT.wav	25.6048	Focal	Ramphastos sulfuratus	13

@@ -1,0 +1,22 @@
+Selection	View	Channel	Begin Time (s)	End Time (s)	Low Freq (Hz)	High Freq (Hz)	Begin File	Begin Path	File Offset (s)	Recording	Model species	Song
+1	Spectrogram 1	1	0.341402116	0.648664021	1355.3	2101.7	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	0.3414	Model	Ramphastos sulfuratus	1
+2	Spectrogram 1	1	0.887645503	1.143697090	1374.9	2023.1	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	0.8876	Model	Ramphastos sulfuratus	2
+3	Spectrogram 1	1	1.416818783	1.826501323	1316.0	1944.5	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	1.4168	Model	Ramphastos sulfuratus	3
+4	Spectrogram 1	1	2.065482804	2.441025132	1316.0	2141.0	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	2.0655	Model	Ramphastos sulfuratus	4
+5	Spectrogram 1	1	2.628796296	2.953128307	1404.4	2288.3	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	2.6288	Model	Ramphastos sulfuratus	5
+6	Spectrogram 1	1	3.209179894	3.550582011	1453.5	2160.6	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	3.2092	Model	Ramphastos sulfuratus	6
+7	Spectrogram 1	1	3.738353175	4.148035714	1394.6	2082.0	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	3.7384	Model	Ramphastos sulfuratus	7
+8	Spectrogram 1	1	4.318736772	4.660138889	1296.4	2042.8	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	4.3187	Model	Ramphastos sulfuratus	8
+9	Spectrogram 1	1	4.933260582	5.223452381	1433.9	2101.7	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	4.9333	Model	Ramphastos sulfuratus	9
+10	Spectrogram 1	1	5.513644180	5.855046296	1296.4	1983.8	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	5.5136	Model	Ramphastos sulfuratus	10
+11	Spectrogram 1	1	6.111097884	6.503710317	1453.5	2121.3	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	6.1111	Model	Ramphastos sulfuratus	11
+12	Spectrogram 1	1	6.638713170	6.964613634	1374.9	2062.4	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	6.6387	Model	Ramphastos sulfuratus	12
+13	Spectrogram 1	1	7.314654874	7.628484951	1453.5	1944.5	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	7.3147	Model	Ramphastos sulfuratus	13
+14	Spectrogram 1	1	8.437200919	8.751030996	1316.0	2121.3	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	8.4372	Model	Ramphastos sulfuratus	14
+15	Spectrogram 1	1	9.608028514	9.921858592	1374.9	2003.5	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	9.6080	Model	Ramphastos sulfuratus	15
+16	Spectrogram 1	1	10.163266343	10.525377971	1335.6	2062.4	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	10.1633	Model	Ramphastos sulfuratus	16
+17	Spectrogram 1	1	10.694363397	11.056475024	1237.4	2062.4	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	10.6944	Model	Ramphastos sulfuratus	17
+18	Spectrogram 1	1	11.273742001	11.563431303	1355.3	2101.7	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	11.2737	Model	Ramphastos sulfuratus	18
+19	Spectrogram 1	1	11.853120605	12.154880294	1276.7	2199.9	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	11.8531	Model	Ramphastos sulfuratus	19
+20	Spectrogram 1	1	12.975666650	13.277426339	1257.1	2101.7	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	12.9757	Model	Ramphastos sulfuratus	20
+21	Spectrogram 1	1	14.134423857	14.496535485	1198.2	2023.1	Ramphastos-sulfuratus-576433_.wav	C:\Users\Pablo\Desktop\Modelo de sp\Models\Ramphastos-sulfuratus-576433_.wav	14.1344	Model	Ramphastos sulfuratus	21
